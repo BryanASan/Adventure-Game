@@ -1,6 +1,6 @@
 import pygame
 import sys, os, random , math, time
-from pygame.locals import *
+
 
 ScreenHeight= 800
 ScreenWidth= 1400
@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,colour):
         super().__init__()
         pygame.draw.circle(screen, colour, [400,250],40)
+        self.radius = 40
         self.x= 400
         self.y=250
         self.rect= pygame.Rect(self.x,self.y, 40,40)
@@ -93,11 +94,18 @@ class Enemy(Player):
 ''' centre position1 , centre position2 , radius1 ,radius2
 x=centre position difference
 y= centre position difference
-
 distance= sqrt((x)**2+(y)**2)
 collide if distance < radius1+ radius2 
 '''
 
+def collide_circle(circle1, circle2):
+    xDif = circle1.x - circle2.x
+    yDif = circle1.y - circle2.y
+    distance = math.sqrt(xDif**2 + yDif**2)
+    if distance < circle1.radius+circle2.radius:
+        return True
+    else:
+        return False
  
 
 def draw_all():
@@ -145,7 +153,9 @@ while running:
                 player.change_speed(0,-5)
     
     player.handle_keys()
-    slime.move_towards_player(player)
+    #slime will only move towards player if they are not touching
+    if not(collide_circle(player,slime)):
+        slime.move_towards_player(player)
     player.update(collidable_objects)
     draw_all()
     pygame.display.update()
